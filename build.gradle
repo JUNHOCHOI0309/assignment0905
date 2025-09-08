@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'org.scoula'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    junitVersion = '5.11.0'
+}
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    implementation 'javax.servlet:jstl:1.2'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'org.glassfish:javax.el:3.0.0' // EL 구현체
+    implementation 'javax.el:javax.el-api:3.0.0' // Expression Language
+    testImplementation 'junit:junit:4.13.2'
+
+    implementation 'org.slf4j:slf4j-simple:2.0.13'
+
+    implementation 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    implementation 'org.mybatis:mybatis:3.5.15'
+    implementation 'mysql:mysql-connector-java:8.0.30' //jdbc 연결
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+war { archiveFileName = 'jsp-mybatis-crud.war' }
+
+test {
+    useJUnitPlatform()
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17) // JDK 17 권장
+    }
+}
