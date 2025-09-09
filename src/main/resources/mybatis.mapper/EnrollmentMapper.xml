@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.multi.dao.EnrollmentDAO">
+
+    <!-- Enrollment DTO 매핑 -->
+    <resultMap id="EnrollmentResult" type="com.multi.dto.Enrollment">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="enrolledAt" column="enrolled_at"/>
+        <result property="studentName" column="student_name"/>
+        <result property="courseTitle" column="course_title"/>
+    </resultMap>
+
+    <!-- 학생별 수강 목록 -->
+    <select id="findByStudentId" parameterType="long" resultMap="EnrollmentResult">
+        SELECT e.id, e.student_id, e.course_id, e.enrolled_at,
+               s.name AS student_name, c.title AS course_title
+        FROM enrollment e
+                 JOIN student s ON e.student_id = s.id
+                 JOIN course c ON e.course_id = c.id
+        WHERE e.student_id = #{studentId}
+        ORDER BY e.enrolled_at DESC
+    </select>
+
+    <!-- 특정 강좌 수강자 목록 -->
+    <select id="findByCourseId" parameterType="long" resultMap="EnrollmentResult">
+        SELECT e.id, e.student_id, e.course_id, e.enrolled_at,
+               s.name AS student_name, c.title AS course_title
+        FROM enrollment e
+                 JOIN student s ON e.student_id = s.id
+                 JOIN course c ON e.course_id = c.id
+        WHERE e.course_id = #{courseId}
+        ORDER BY e.enrolled_at DESC
+    </select>
+
+    <!-- 중복 수강 여부 확인 -->
+    <select id="exists" parameterType="map" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM enrollment
+        WHERE student_id=#{studentId} AND course_id=#{courseId}
+    </select>
+
+    <!-- 수강신청 -->
+    <insert id="insert" parameterType="com.multi.dto.Enrollment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO enrollment(student_id, course_id, enrolled_at)
+        VALUES(#{studentId}, #{courseId}, NOW())
+    </insert>
+
+    <!-- 수강취소 -->
+    <delete id="delete" parameterType="map">
+        DELETE FROM enrollment
+        WHERE student_id=#{studentId} AND course_id=#{courseId}
+    </delete>
+
+</mapper>
