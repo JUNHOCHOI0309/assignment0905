@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--Course DTO Mapping-->
+<mapper namespace="com.multi.mapper.CourseMapper">
+    <resultMap id="courseMap" type="com.multi.dto.Course">
+        <id     property="id"        column="id"/>
+        <result property="code"      column="code"/>
+        <result property="title"     column="title"/>
+        <result property="professor" column="professor"/>
+        <result property="credit"    column="credit"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <!--전체 강좌 목록 + keyword 있으면 검색 + 페이징-->
+    <select id="findAll" parameterType="map" resultMap="courseMap">
+        SELECT id, code, title, professor, credit, created_at FROM course
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (title LIKE CONCAT('%', #{keyword}, '%')
+                OR code  LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!--검색 조건을 적용한 전체 강좌 수 조회-->
+    <select id="countAll" parameterType="map" resultType="int">
+        SELECT count(*) from course
+        <where>
+            <if test="keyword !=null and keyword !=''">
+                (title LIKE CONCAT('%', #{keyword}, '%')
+                OR code  LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <!--id 조회-->
+    <select id="findById" parameterType="long" resultMap="courseMap">
+        SELECT id, code, title, professor, credit, created_at
+        FROM course
+        WHERE id = #{id}
+    </select>
+
+    <!--과목명 조회-->
+    <select id="findByTitle" parameterType="string" resultMap="courseMap">
+        SELECT id, code, title, professor, credit, created_at FROM course
+        WHERE title=#{title}
+    </select>
+
+    <!--과목코드 조회-->
+    <select id="findByCode" parameterType="string" resultMap="courseMap">
+        SELECT id, code, title, professor, credit, created_at FROM course
+        WHERE code=#{code}
+    </select>
+
+    <!--강좌 추가-->
+    <insert id="insert" parameterType="com.multi.dto.Course" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO course(code, title, professor, credit )
+        VALUES (#{code}, #{title}, #{professor}, #{credit})
+    </insert>
+
+    <!--강좌 수정-->
+    <update id="update" parameterType="com.multi.dto.Course">
+        UPDATE course
+        SET code=#{code},
+            title=#{title},
+            professor=#{professor},
+            credit=#{credit}
+        WHERE id=#{id}
+    </update>
+
+    <!--강좌 삭제-->
+    <delete id="delete" parameterType="long">
+        DELETE FROM course WHERE id=#{id}
+    </delete>
+</mapper>
