@@ -1,3 +1,6 @@
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ page pageEncoding="UTF-8"%>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
 
   <a class="navbar-brand" href="${pageContext.request.contextPath}/">Univ</a>
