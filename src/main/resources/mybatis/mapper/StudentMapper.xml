@@ -26,7 +26,7 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <select id="countAll" parameterType="map" resultType="int">
+    <select id="countAll" parameterType="map" resultType="long">
         SELECT COUNT(*)
         FROM student
         <where>
