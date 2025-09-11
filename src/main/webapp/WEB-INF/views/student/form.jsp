@@ -62,7 +62,7 @@
 
         <div class="text-right">
 
-            <a href="${pageContext.request.contextPath}/students" class="btn btn-secondary">취소</a>
+            <a href="${pageContext.request.contextPath}/front/students" class="btn btn-secondary">취소</a>
 
             <button class="btn btn-primary" type="submit">${mode == 'edit' ? '수정' : '등록'}</button>
 

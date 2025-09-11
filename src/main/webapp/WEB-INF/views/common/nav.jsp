@@ -1,3 +1,5 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
 
   <a class="navbar-brand" href="${pageContext.request.contextPath}/">Univ</a>
@@ -12,7 +14,7 @@
 
     <ul class="navbar-nav mr-auto">
 
-      <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/students">학생</a></li>
+      <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/front/students">학생</a></li>
 
       <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/courses">강좌</a></li>
 

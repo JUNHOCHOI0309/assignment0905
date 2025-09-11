@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -12,7 +12,7 @@
 
     <h3 class="mb-0">학생 목록</h3>
 
-    <a href="${pageContext.request.contextPath}/students/new" class="btn btn-primary">학생 등록</a>
+    <a href="${pageContext.request.contextPath}/front/students/new" class="btn btn-primary">학생 등록</a>
 
   </div>
 
@@ -50,15 +50,15 @@
 
           <td>${s.studentNo}</td>
 
-          <td><a href="${pageContext.request.contextPath}/students/${s.id}">${s.name}</a></td>
+          <td><a href="${pageContext.request.contextPath}/front/students/${s.id}">${s.name}</a></td>
 
           <td>${s.dept}</td>
 
           <td class="text-right">
 
-            <a class="btn btn-sm btn-outline-primary" href="${pageContext.request.contextPath}/students/${s.id}/edit">수정</a>
+            <a class="btn btn-sm btn-outline-primary" href="${pageContext.request.contextPath}/front/students/${s.id}/edit">수정</a>
 
-            <form method="post" action="${pageContext.request.contextPath}/students/${s.id}/delete" class="d-inline" onsubmit="return confirm('삭제할까요?');">
+            <form method="post" action="${pageContext.request.contextPath}/front/students/${s.id}/delete" class="d-inline" onsubmit="return confirm('삭제할까요?');">
 
               <button class="btn btn-sm btn-outline-danger" type="submit">삭제</button>
 
@@ -82,7 +82,7 @@
 
         <c:forEach var="p" begin="1" end="${page.totalPages}">
 
-          <li class="page-item ${p==page.number ? 'active' : ''}">
+          <li class="page-item ${p==page.page ? 'active' : ''}">
 
             <a class="page-link" href="?page=${p}&q=${param.q}">${p}</a>
 
