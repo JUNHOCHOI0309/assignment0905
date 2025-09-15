@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
@@ -7,7 +7,9 @@
 <div class="container">
     <h3 class="mb-3">강좌 등록</h3>
 
-    <form method="post" action="${pageContext.request.contextPath}/courses">
+    <form method="post" action="${pageContext.request.contextPath}/courses" accept-charset="UTF-8">
+        <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
+
         <!-- create action을 넘겨줘야 insert 실행됨 -->
         <input type="hidden" name="action" value="create"/>
 

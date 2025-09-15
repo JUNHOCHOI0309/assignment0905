@@ -25,7 +25,7 @@
     </c:if>
 
     <form method="post" action="${action}">
-
+        <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
         <div class="form-group">
 
             <label>학번</label>

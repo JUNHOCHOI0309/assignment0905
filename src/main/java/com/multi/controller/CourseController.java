@@ -1,8 +1,12 @@
 package com.multi.controller;
 
 import com.multi.dto.Course;
+import com.multi.exception.AppException;
+import com.multi.exception.NotFoundException;
+import com.multi.exception.ValidationException;
 import com.multi.service.CourseService;
 import com.multi.service.CourseServiceImpl;
+import com.multi.util.LoggerUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,6 +31,7 @@ public class CourseController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         String action = req.getParameter("action");
 
         if(action == null || action.equals("list")){
@@ -74,6 +79,7 @@ public class CourseController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
 
         String action = req.getParameter("action");
         String id = req.getParameter("id");
@@ -88,7 +94,15 @@ public class CourseController extends HttpServlet {
             c.setTitle(title);
             c.setProfessor(professor);
             c.setCredit(credit);
-            courseService.insert(c);
+            try{
+                courseService.insert(c);
+                LoggerUtil.info("학생 생성 완료 : " + c.toString());
+            } catch (ValidationException e){
+                LoggerUtil.warn("학성 생성 실패 : " + c.toString());
+                throw e;
+            } catch (Exception e){
+                new AppException(e.getMessage(), e);
+            }
         } else if ("update".equals(action)) { // 수정
             Course c = new Course();
             c.setId(Long.valueOf(id));
@@ -96,9 +110,25 @@ public class CourseController extends HttpServlet {
             c.setTitle(title);
             c.setProfessor(professor);
             c.setCredit(credit);
-            courseService.update(c);
+            try{
+                courseService.update(c);
+                LoggerUtil.info("학생 업데이트 완료 : " + c.toString());
+            } catch (NotFoundException e){
+                LoggerUtil.warn("학성 업데이트 실패 : " + c.toString());
+                throw e;
+            } catch (Exception e){
+                new AppException(e.getMessage(), e);
+            }
         } else  if ("delete".equals(action)) { // 삭제
-            courseService.delete(Long.valueOf(id));
+            try{
+                courseService.delete(Long.valueOf(id));
+                LoggerUtil.info("학생 업데이트 완료 : " + Long.valueOf(id));
+            } catch (NotFoundException e){
+                LoggerUtil.warn("학성 업데이트 실패 : " + Long.valueOf(id));
+                throw e;
+            } catch (Exception e){
+                new AppException(e.getMessage(), e);
+            }
         }
 
         resp.sendRedirect(req.getContextPath() + "/courses?action=list");

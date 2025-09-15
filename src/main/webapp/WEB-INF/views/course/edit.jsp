@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
@@ -8,6 +8,7 @@
   <h3 class="mb-3">강좌 수정</h3>
 
   <form method="post" action="${pageContext.request.contextPath}/courses">
+    <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
     <input type="hidden" name="action" value="update"/>
     <input type="hidden" name="id" value="${course.id}"/>
 

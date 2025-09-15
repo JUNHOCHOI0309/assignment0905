@@ -1,6 +1,9 @@
 package com.multi.service;
 
 import com.multi.dao.CourseDAO;
+import com.multi.exception.AppException;
+import com.multi.exception.NotFoundException;
+import com.multi.util.LoggerUtil;
 
 import java.util.List;
 
@@ -47,6 +50,15 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void delete(Long id) {
-        dao.delete(id);
+        try {
+            dao.delete(id);
+            LoggerUtil.info("강좌 삭제 완료: id=" + id);
+        } catch (NotFoundException e) {
+            LoggerUtil.warn("존재하지 않는 강좌 삭제 시도: id=" + id);
+            throw e;
+        } catch (Exception e) {
+            LoggerUtil.error("강좌 삭제 실패: id=" + id, e);
+            throw new AppException("강좌 삭제 실패", e);
+        }
     }
 }

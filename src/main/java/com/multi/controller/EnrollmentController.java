@@ -32,7 +32,7 @@ public class EnrollmentController extends HttpServlet {
 
         // --- 안전장치 1: 파라미터가 null이거나 비어있는지 확인 ---
         if (studentIdStr == null || studentIdStr.trim().isEmpty()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "studentId 파라미터가 필요합니다.");
+            resp.sendRedirect(req.getContextPath() + "/front/students?action=list");
             return; // 메서드 실행을 중단합니다.
         }
 
@@ -103,9 +103,9 @@ public class EnrollmentController extends HttpServlet {
         } catch (DuplicateEnrollmentException e) {
             req.setAttribute("error", e.getMessage());
             req.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(req, resp);
+            throw new DuplicateEnrollmentException(e.getMessage());
         } catch (Exception e) {
             // 그 외 예상치 못한 서버 오류 처리
-            e.printStackTrace(); // 서버 로그에 에러 기록
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "요청 처리 중 오류가 발생했습니다.");
         }
     }

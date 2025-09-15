@@ -1,6 +1,7 @@
 package com.multi.controller;
 
 import com.google.protobuf.ServiceException;
+import com.multi.util.LoggerUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,9 +41,11 @@ public class FrontController extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+        LoggerUtil.info("uri : " + uri + ", path : " + path + ", controller : " + controller.getClass().getName());
         try {
             controller.handle(req,resp,path);
         } catch (ServletException e) {
+            LoggerUtil.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

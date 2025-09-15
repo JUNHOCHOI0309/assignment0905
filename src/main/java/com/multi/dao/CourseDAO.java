@@ -26,7 +26,7 @@ public class CourseDAO {
         params.put("size", s);
         params.put("offset", offset);
 
-        try(SqlSession session = SqlSessionFactoryProvider.getFactory().openSession()){
+        try(SqlSession session = SqlSessionFactoryProvider.getSqlSessionFactory().openSession()){
             return session.getMapper(CourseMapper.class).findAll(params);
         }
     }
@@ -34,31 +34,31 @@ public class CourseDAO {
     public int countAll(String keyword){
         Map<String,Object> params = new HashMap<>();
         params.put("keyword", keyword);
-        try(SqlSession session = SqlSessionFactoryProvider.getFactory().openSession()){
+        try(SqlSession session = SqlSessionFactoryProvider.getSqlSessionFactory().openSession()){
             return session.getMapper(CourseMapper.class).countAll(params);
         }
     }
 
     public Course findById(Long id){
-        try(SqlSession session = SqlSessionFactoryProvider.getFactory().openSession()){
+        try(SqlSession session = SqlSessionFactoryProvider.getSqlSessionFactory().openSession()){
             return session.getMapper(CourseMapper.class).findById(id);
         }
     }
 
     public Course findByTitle(String title){
-        try(SqlSession session = SqlSessionFactoryProvider.getFactory().openSession()){
+        try(SqlSession session = SqlSessionFactoryProvider.getSqlSessionFactory().openSession()){
             return session.getMapper(CourseMapper.class).findByTitle(title);
         }
     }
 
     public Course findByCode(String code){
-        try(SqlSession session = SqlSessionFactoryProvider.getFactory().openSession()){
+        try(SqlSession session = SqlSessionFactoryProvider.getSqlSessionFactory().openSession()){
             return session.getMapper(CourseMapper.class).findByCode(code);
         }
     }
 
     public int insert(Course course){
-        try(SqlSession session = SqlSessionFactoryProvider.getFactory().openSession()){
+        try(SqlSession session = SqlSessionFactoryProvider.getSqlSessionFactory().openSession()){
             int rows = session.getMapper(CourseMapper.class).insert(course);
             session.commit();
             return rows;
@@ -66,7 +66,7 @@ public class CourseDAO {
     }
 
     public int update(Course course){
-        try(SqlSession session = SqlSessionFactoryProvider.getFactory().openSession()){
+        try(SqlSession session = SqlSessionFactoryProvider.getSqlSessionFactory().openSession()){
             int rows = session.getMapper(CourseMapper.class).update(course);
             session.commit();
             return rows;
@@ -74,7 +74,7 @@ public class CourseDAO {
     }
 
     public int delete(Long id){
-        try(SqlSession session = SqlSessionFactoryProvider.getFactory().openSession()){
+        try(SqlSession session = SqlSessionFactoryProvider.getSqlSessionFactory().openSession()){
             int rows = session.getMapper(CourseMapper.class).delete(id);
             session.commit();
             return rows;

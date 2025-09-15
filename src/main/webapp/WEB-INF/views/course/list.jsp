@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
@@ -39,6 +39,7 @@
                             <form method="post" action="${pageContext.request.contextPath}/courses" class="d-inline" onsubmit="return confirm('삭제할까요?');">
                                 <input type="hidden" name="action" value="delete"/>
                                 <input type="hidden" name="id" value="${c.id}"/>
+                                <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
                                 <button class="btn btn-sm btn-outline-danger" type="submit">삭제</button>
                             </form>
                         </td>
