@@ -1,112 +1,75 @@
 package com.multi.controller;
 
-import com.multi.dto.Student;
-import com.multi.exception.DuplicateEnrollmentException;
+import com.multi.dto.Enrollment;
 import com.multi.service.EnrollmentService;
-import com.multi.service.StudentService;
+import com.multi.service.EnrollmentServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
+import java.util.List;
 
-@WebServlet("/enrollments")
+@WebServlet("/enrollments/*")
 public class EnrollmentController extends HttpServlet {
-    private EnrollmentService enrollmentService;
-    private StudentService studentService;
+    private final EnrollmentService enrollmentService = new EnrollmentServiceImpl();
 
     @Override
-    public void init() {
-        this.enrollmentService = (EnrollmentService) getServletContext().getAttribute("enrollmentService");
-        this.studentService = (StudentService) getServletContext().getAttribute("studentService");
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        String action = req.getParameter("action");
-        String studentIdStr = req.getParameter("studentId"); // 먼저 문자열로 받습니다.
-
-        // --- 안전장치 1: 파라미터가 null이거나 비어있는지 확인 ---
-        if (studentIdStr == null || studentIdStr.trim().isEmpty()) {
-            resp.sendRedirect(req.getContextPath() + "/front/students?action=list");
-            return; // 메서드 실행을 중단합니다.
-        }
-
-        int studentIdInt;
-        try {
-            // --- 안전장치 2: 숫자로 변환 시도 ---
-            studentIdInt = Integer.parseInt(studentIdStr);
-        } catch (NumberFormatException e) {
-            // 숫자가 아닌 값(예: "abc")이 들어오면 에러 처리
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "studentId는 숫자여야 합니다.");
-            return;
-        }
-
-        if ("detail".equals(action)) {
-            Student student = studentService.get(studentIdInt);
-            req.setAttribute("student", student);
-
-            req.getRequestDispatcher("/WEB-INF/views/student/detail.jsp")
-                    .forward(req, resp);
-        } else {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "유효하지 않은 action입니다.");
-        }
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        String action = req.getParameter("action");
-        String studentIdStr = req.getParameter("studentId");
-        String courseIdStr = req.getParameter("courseId");
-
-        // --- 안전장치 1: 필수 파라미터들이 비어있는지 확인 ---
-        if (studentIdStr == null || studentIdStr.trim().isEmpty() ||
-                courseIdStr == null || courseIdStr.trim().isEmpty()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "studentId와 courseId는 필수 항목입니다.");
-            return;
-        }
-
-        int studentIdInt;
-        Long studentId;
-        Long courseId;
-        try {
-            // --- 안전장치 2: 숫자로 변환 시도 ---
-            studentIdInt = Integer.parseInt(studentIdStr);
-            studentId = Long.valueOf(studentIdInt);
-            courseId = Long.valueOf(courseIdStr);
-        } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "studentId와 courseId는 숫자여야 합니다.");
-            return;
-        }
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String path = req.getPathInfo(); // 예: "/", "/student/1"
 
         try {
-            if ("cancel".equals(action)) {
-                enrollmentService.cancel(studentId, courseId);
-            } else if ("enroll".equals(action)) {
-                enrollmentService.enroll(studentId, courseId);
+            if (path != null && path.matches("^/student/\\d+$")) {
+                // 특정 학생의 수강 목록 조회
+                Long studentId = extractId(path);
+                List<Enrollment> enrollments = enrollmentService.getEnrollmentsByStudent(studentId);
+                req.setAttribute("enrollments", enrollments);
+                req.getRequestDispatcher("/WEB-INF/views/enrollment/list.jsp").forward(req, resp);
             } else {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "유효하지 않은 action입니다.");
-                return;
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown path: " + path);
             }
-
-            Student student = studentService.get(studentIdInt);
-            req.setAttribute("student", student);
-            req.getRequestDispatcher("/WEB-INF/views/student/detail.jsp")
-                    .forward(req, resp);
-
-        } catch (DuplicateEnrollmentException e) {
+        } catch (Exception e) {
             req.setAttribute("error", e.getMessage());
             req.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(req, resp);
-            throw new DuplicateEnrollmentException(e.getMessage());
-        } catch (Exception e) {
-            // 그 외 예상치 못한 서버 오류 처리
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "요청 처리 중 오류가 발생했습니다.");
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String path = req.getPathInfo(); // 예: "/", "/cancel"
+        String referer = req.getHeader("Referer");
+
+        try {
+            Long studentId = Long.valueOf(req.getParameter("studentId"));
+            Long courseId = Long.valueOf(req.getParameter("courseId"));
+
+            if ("/cancel".equals(path)) {
+                enrollmentService.cancel(studentId, courseId);
+            } else { // 기본: 신청
+                enrollmentService.enroll(studentId, courseId);
+            }
+
+            if (referer != null) {
+                resp.sendRedirect(referer);
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/enrollments/student/" + studentId);
+            }
+        } catch (NumberFormatException e) {
+            req.setAttribute("error", "잘못된 파라미터 형식입니다.");
+            req.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(req, resp);
+        } catch (Exception e) {
+            req.setAttribute("error", e.getMessage());
+            req.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(req, resp);
+        }
+    }
+
+    private Long extractId(String path) {
+        String[] segments = path.split("/");
+        for (String seg : segments) {
+            if (seg.matches("\\d+")) {
+                return Long.valueOf(seg);
+            }
+        }
+        throw new IllegalArgumentException("No numeric id in path: " + path);
     }
 }
