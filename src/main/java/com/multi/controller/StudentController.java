@@ -3,16 +3,13 @@ package com.multi.controller;
 import com.multi.dto.PageRequest;
 import com.multi.dto.PageResult;
 import com.multi.dto.Student;
-import com.multi.exception.NotFoundException;
 import com.multi.service.StudentService;
 import com.multi.service.StudentServiceImpl;
-import com.multi.util.LoggerUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.rmi.ServerException;
 
 public class StudentController implements SubController{
     private final StudentService studentService = new StudentServiceImpl();
@@ -114,30 +111,14 @@ public class StudentController implements SubController{
         int id = extractId(request.getPathInfo());
         Student s = bind(request);
         s.setId(id);
-        try{
-            studentService.update(s);
-            LoggerUtil.info("Student update success. id = " + studentService.get(id).getId());
-        } catch (NotFoundException e) {
-            LoggerUtil.warn("Student update fail. id = " + studentService.get(id).getId());
-            throw e;
-        } catch (Exception e) {
-            LoggerUtil.error("Student update fail. id = " + studentService.get(id).getId(), e);
-        }
+        studentService.update(s);
         response.sendRedirect(request.getContextPath() + "/front/students/" + id);
     }
 
     private void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         System.out.println("DEBUG delete pathInfo = " + request.getPathInfo());
         int id = extractId(request.getPathInfo());
-        try{
-            studentService.delete(id);
-            LoggerUtil.info("Student update success. id = " + studentService.get(id).getId());
-        } catch (NotFoundException e) {
-            LoggerUtil.warn("Student update fail. id = " + studentService.get(id).getId());
-            throw e;
-        } catch (Exception e){
-            LoggerUtil.error("Student update fail. id = " + studentService.get(id).getId(), e);
-        }
+        studentService.delete(id);
         response.sendRedirect(request.getContextPath() + "/front/students");
     }
 
